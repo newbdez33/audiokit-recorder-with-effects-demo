@@ -59,7 +59,7 @@ class ViewController: UIViewController {
             let file = try AKAudioFile(readFileName: "claps.mp3")
             cheerPlayer = AKPlayer(audioFile: file)
             cheerPlayer.isLooping = false
-            cheerPlayer.volume = 0.1
+            cheerPlayer.volume = 1
             cheerPlayer.stop()
         } catch {
             print("get file failed")
@@ -76,7 +76,7 @@ class ViewController: UIViewController {
         super.init(coder: aDecoder)
         
         print(getDocumentsDirectory())
-        
+        mic.volume = 1
         // Clean tempFiles !
         AKAudioFile.cleanTempDirectory()
         // Session settings 设置缓冲区大小
@@ -111,7 +111,8 @@ class ViewController: UIViewController {
             return player.pitchShift(semitones: shift)
         }
         effect.parameters = [0, 0, 0]
-        
+        effect.stop()
+
         // Patching
         micMixer = AKMixer(effect, cheerPlayer)
         micBooster = AKBooster(micMixer)
@@ -131,7 +132,7 @@ class ViewController: UIViewController {
         
         
         moogLadder = AKMoogLadder(player)
-        
+        moogLadder.stop()
         
         // Create a muted mixer for recording audio, so AudioKit will pull audio through the recording Mixer, but not play it through the output.
         recordingDummyMixer = AKMixer(micBooster)
@@ -269,7 +270,11 @@ class ViewController: UIViewController {
     }
     
     @IBAction func playCheerVoiceTouched(sender: UIButton) {
-        cheerPlayer.play()
+        if cheerPlayer.isPlaying {
+            cheerPlayer.stop()
+        }else {
+            cheerPlayer.play()
+        }
     }
     
     func updateTimePitch(value: Double) {
